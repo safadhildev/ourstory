@@ -6,20 +6,21 @@
  * @flow strict-local
  */
 
-import React from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-} from 'react-native';
+import React, {useEffect} from 'react';
+import {SafeAreaView, View, Text, StatusBar} from 'react-native';
+import firebase from '@react-native-firebase/app';
+import firestore from '@react-native-firebase/firestore';
 
 const App = () => {
+  const getData = async () => {};
+
+  useEffect(() => {
+    getData();
+  });
+
   return (
     <>
-      <StatusBar barStyle="light-content" />
+      <StatusBar />
       <SafeAreaView>
         <View>
           <Text>Hello There</Text>
