@@ -8,24 +8,15 @@
 
 import React, {useEffect} from 'react';
 import {SafeAreaView, View, Text, StatusBar} from 'react-native';
-import firebase from '@react-native-firebase/app';
-import firestore from '@react-native-firebase/firestore';
+import 'react-native-gesture-handler';
+import Navigation from './src/routes/navigation';
+import color from './src/components/Color';
 
 const App = () => {
-  const getData = async () => {};
-
-  useEffect(() => {
-    getData();
-  });
-
   return (
     <>
-      <StatusBar />
-      <SafeAreaView>
-        <View>
-          <Text>Hello There</Text>
-        </View>
-      </SafeAreaView>
+      <StatusBar barStyle="dark-content" backgroundColor={color.white} />
+      <Navigation />
     </>
   );
 };
