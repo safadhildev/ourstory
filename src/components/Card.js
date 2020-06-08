@@ -8,7 +8,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginHorizontal: 20,
-
     marginVertical: 10,
     shadowColor: '#000',
     shadowOffset: {
@@ -44,9 +43,11 @@ const styles = StyleSheet.create({
 });
 
 const img = require('../../assets/image/testimg.jpg');
-const Card = ({title, content, onPress, comments}) => {
+const Card = ({title, content, onPress, comments, last}) => {
   return (
-    <TouchableOpacity onPress={onPress} style={styles.container}>
+    <TouchableOpacity
+      onPress={onPress}
+      style={[styles.container, last && {marginBottom: 70}]}>
       <View style={styles.card}>
         <View style={styles.imageWrapper}>
           <Image source={img} style={styles.image} resizeMode="cover" />

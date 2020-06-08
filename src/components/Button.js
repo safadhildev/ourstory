@@ -3,11 +3,11 @@ import {TouchableOpacity, View, Text, StyleSheet} from 'react-native';
 
 const styles = StyleSheet.create({
   wrapper: {
-    width: 200,
+    width: 150,
     backgroundColor: '#000',
     paddingHorizontal: 30,
     paddingVertical: 10,
-    borderRadius: 20,
+    borderRadius: 8,
     alignItems: 'center',
   },
   buttonText: {
@@ -16,9 +16,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-const Button = ({text, onPress}) => {
+const Button = ({text, onPress, style}) => {
   return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
+    <TouchableOpacity onPress={onPress} activeOpacity={0.8} style={style}>
       <View style={styles.wrapper}>
         <Text allowFontScaling={false} style={styles.buttonText}>
           {text}

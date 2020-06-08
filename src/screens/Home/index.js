@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, SafeAreaView, FlatList} from 'react-native';
+import {View, Text, SafeAreaView, FlatList, ScrollView} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 import firebase from '@react-native-firebase/app';
@@ -38,6 +38,7 @@ const Home = () => {
 
   const renderStories = (item, index) => {
     const {title, content} = item;
+    const last = data.length - 1;
 
     return (
       <Card
@@ -45,6 +46,7 @@ const Home = () => {
         onPress={() => {
           alert('diehdieihd');
         }}
+        last={index === last ? true : false}
       />
     );
   };
@@ -74,8 +76,7 @@ const Home = () => {
 
   return (
     <View style={styles.container}>
-      <Header text="Home" onPress={() => onOpenDrawer()} />
-
+      <Header text="Home" onPress={() => onOpenDrawer()} menu="drawer" />
       <FlatList
         data={data}
         renderItem={({item, index}) => renderStories(item, index)}

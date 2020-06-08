@@ -13,4 +13,7 @@ export default {
   darkBlue: '#1A237E',
   darkGreen: '#1B5E20',
   darkGrey: '#424242',
+
+  // light
+  lightGrey: '#eeeeee',
 };
