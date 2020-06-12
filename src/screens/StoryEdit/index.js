@@ -9,6 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+import moment from 'moment';
 import Header from '../../components/Header';
 import Input from '../../components/Input';
 import Color from '../../components/Color';
@@ -31,11 +32,12 @@ const options = {
   },
 };
 const StoryEdit = () => {
-  const [title, setTitle] = useState(null);
-  const [content, setContent] = useState(null);
-  const [imageData, setImageData] = useState(null);
+  const [newStory, setNewStory] = useState({
+    title: null,
+    content: null,
+    thumbnail: null,
+  });
   const [components, setComponents] = useState([]);
-  const [thumbnail, setThumbnail] = useState(null);
   const navigation = useNavigation();
 
   const onBack = () => {
@@ -45,10 +47,16 @@ const StoryEdit = () => {
   const onChange = (type, text) => {
     switch (type) {
       case 'title':
-        setTitle(text);
+        setNewStory({
+          ...newStory,
+          title: text,
+        });
         break;
       case 'content':
-        setContent(text);
+        setNewStory({
+          ...newStory,
+          content: text,
+        });
         break;
       default:
         break;
@@ -75,11 +83,9 @@ const StoryEdit = () => {
         // let source = { uri: 'data:image/jpeg;base64,' + response.data };
 
         if (type === 'thumbnail') {
-          setThumbnail({
-            fileName,
-            height,
-            width,
-            source,
+          setNewStory({
+            ...newStory,
+            thumbnail: {fileName, height, width, source},
           });
         }
       }
@@ -91,14 +97,28 @@ const StoryEdit = () => {
   };
 
   const onRemoveThumbnail = () => {
-    setThumbnail(null);
+    setNewStory({
+      ...newStory,
+      thumbnail: null,
+    });
+  };
+
+  const onGoBack = () => {
+    setNewStory({title: null, content: null, thumbnail: null});
+    navigation.goBack();
   };
 
   const onSubmit = async () => {
+    const key = moment().unix().toString();
+    const date = moment().format('LLLL');
+
+    const {title, content} = newStory;
+
     await ref
-      .add({title, content})
+      .doc(key)
+      .set({title, content, date})
       .then(() => {
-        navigation.goBack();
+        onGoBack();
       })
       .catch((err) => {
         console.log(err);
@@ -106,6 +126,7 @@ const StoryEdit = () => {
   };
 
   const onValidate = () => {
+    const {title, content} = newStory;
     if (title) {
       onSubmit();
     } else {
@@ -113,12 +134,13 @@ const StoryEdit = () => {
     }
   };
 
+  const {content, title, thumbnail} = newStory;
   return (
     <ScrollView style={{flex: 1, backgroundColor: Color.white}}>
       <KeyboardAvoidingView>
         <Header
           onPress={() => {
-            onBack();
+            onGoBack();
           }}
         />
         {/* {components && components} */}
