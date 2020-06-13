@@ -9,12 +9,17 @@ import {
   Alert,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+import firebase from '@react-native-firebase/app';
+import storage from '@react-native-firebase/storage';
+import {utils} from '@react-native-firebase/app';
+import moment from 'moment';
 import Header from '../../components/Header';
 import Input from '../../components/Input';
 import Color from '../../components/Color';
 import {useNavigation} from '@react-navigation/native';
 import ImagePicker from 'react-native-image-picker';
 import Button from '../../components/Button';
+import {set} from 'react-native-reanimated';
 
 const back = require('../../../assets/icons/back.png');
 const cancel = require('../../../assets/icons/criss-cross.png');
@@ -31,11 +36,13 @@ const options = {
   },
 };
 const StoryEdit = () => {
-  const [title, setTitle] = useState(null);
-  const [content, setContent] = useState(null);
-  const [imageData, setImageData] = useState(null);
+  const [newStory, setNewStory] = useState({
+    title: null,
+    content: null,
+    thumbnail: null,
+  });
+  const [loading, setLoading] = useState(false);
   const [components, setComponents] = useState([]);
-  const [thumbnail, setThumbnail] = useState(null);
   const navigation = useNavigation();
 
   const onBack = () => {
@@ -45,10 +52,16 @@ const StoryEdit = () => {
   const onChange = (type, text) => {
     switch (type) {
       case 'title':
-        setTitle(text);
+        setNewStory({
+          ...newStory,
+          title: text,
+        });
         break;
       case 'content':
-        setContent(text);
+        setNewStory({
+          ...newStory,
+          content: text,
+        });
         break;
       default:
         break;
@@ -75,11 +88,9 @@ const StoryEdit = () => {
         // let source = { uri: 'data:image/jpeg;base64,' + response.data };
 
         if (type === 'thumbnail') {
-          setThumbnail({
-            fileName,
-            height,
-            width,
-            source,
+          setNewStory({
+            ...newStory,
+            thumbnail: {fileName, height, width, uri: source.uri},
           });
         }
       }
@@ -91,14 +102,41 @@ const StoryEdit = () => {
   };
 
   const onRemoveThumbnail = () => {
-    setThumbnail(null);
+    setNewStory({
+      ...newStory,
+      thumbnail: null,
+    });
+  };
+
+  const onGoBack = () => {
+    setNewStory({title: null, content: null, thumbnail: null});
+    navigation.goBack();
   };
 
   const onSubmit = async () => {
+    const key = moment().unix().toString();
+    const date = moment().format('LLLL');
+    let thumbnailUrl = null;
+
+    const {title, content, thumbnail} = newStory;
+
+    if (thumbnail) {
+      const localUrl = thumbnail.uri.replace('file://', '');
+      const storageRef = storage().ref(
+        `/stories/${key}/thumbnail/${thumbnail.fileName}`,
+      );
+
+      await storageRef.putFile(localUrl);
+
+      thumbnailUrl = await storageRef.getDownloadURL();
+    }
     await ref
-      .add({title, content})
+      .doc(key)
+      .set({title, content, date, thumbnail: thumbnailUrl})
       .then(() => {
-        navigation.goBack();
+        console.log('success');
+        setLoading(false);
+        onGoBack();
       })
       .catch((err) => {
         console.log(err);
@@ -106,19 +144,22 @@ const StoryEdit = () => {
   };
 
   const onValidate = () => {
+    const {title, content} = newStory;
     if (title) {
+      setLoading(true);
       onSubmit();
     } else {
-      Alert('Error', "Title can't be empty");
+      Alert.alert('Error', "Title can't be empty");
     }
   };
 
+  const {content, title, thumbnail} = newStory;
   return (
     <ScrollView style={{flex: 1, backgroundColor: Color.white}}>
       <KeyboardAvoidingView>
         <Header
           onPress={() => {
-            onBack();
+            onGoBack();
           }}
         />
         {/* {components && components} */}
@@ -136,7 +177,7 @@ const StoryEdit = () => {
                 borderRadius: 1,
               }}>
               <Image
-                source={thumbnail ? thumbnail.source : placeholderImage}
+                source={thumbnail ? {uri: thumbnail.uri} : placeholderImage}
                 resizeMode="contain"
                 style={{width: '100%', height: '100%'}}
               />
@@ -145,7 +186,7 @@ const StoryEdit = () => {
                   style={{
                     position: 'absolute',
                     alignSelf: 'center',
-                    top: 200,
+                    top: 130,
                     opacity: 0.4,
                   }}>
                   Add Image
@@ -184,7 +225,7 @@ const StoryEdit = () => {
         <Input
           value={content}
           onChangeText={(text) => onChange('content', text)}
-          placeholder="Say somthing ..."
+          placeholder="Say something ..."
           multiline={true}
         />
         <View
@@ -193,7 +234,8 @@ const StoryEdit = () => {
             alignItems: 'flex-end',
           }}>
           <Button
-            text="Add"
+            disabled={loading}
+            text={loading ? 'Uploading...' : 'Upload'}
             onPress={() => {
               onValidate();
             }}

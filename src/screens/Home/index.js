@@ -37,11 +37,14 @@ const Home = () => {
   };
 
   const renderStories = (item, index) => {
-    const {title, content} = item;
+    const {title, content, thumbnail} = item;
     const last = data.length - 1;
+
+    console.log({thumbnail});
 
     return (
       <Card
+        thumbnail={thumbnail}
         title={title}
         onPress={() => {
           alert('diehdieihd');
@@ -54,11 +57,12 @@ const Home = () => {
   const collectionUpdate = (querySnapshot) => {
     const documents = [];
     querySnapshot.forEach((doc) => {
-      const {title, content} = doc.data();
+      const {title, content, thumbnail} = doc.data();
       const dataObj = {
         id: doc.id,
         title,
         content,
+        thumbnail,
       };
       documents.push(dataObj);
     });
