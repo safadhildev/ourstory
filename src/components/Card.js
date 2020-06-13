@@ -43,14 +43,18 @@ const styles = StyleSheet.create({
 });
 
 const img = require('../../assets/image/testimg.jpg');
-const Card = ({title, content, onPress, comments, last}) => {
+const Card = ({title, content, onPress, comments, last, thumbnail}) => {
   return (
     <TouchableOpacity
       onPress={onPress}
       style={[styles.container, last && {marginBottom: 70}]}>
       <View style={styles.card}>
         <View style={styles.imageWrapper}>
-          <Image source={img} style={styles.image} resizeMode="cover" />
+          <Image
+            source={thumbnail ? {uri: thumbnail} : img}
+            style={styles.image}
+            resizeMode="cover"
+          />
         </View>
         <View style={styles.contentContainer}>
           <Text allowFontScaling={false} style={styles.title}>
