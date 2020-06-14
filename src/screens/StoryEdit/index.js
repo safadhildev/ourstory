@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -35,18 +35,29 @@ const options = {
     skipBackup: true,
   },
 };
-const StoryEdit = () => {
+const StoryEdit = ({route}) => {
   const [newStory, setNewStory] = useState({
     title: null,
     content: null,
     thumbnail: null,
   });
+
   const [loading, setLoading] = useState(false);
   const [components, setComponents] = useState([]);
   const navigation = useNavigation();
+  const [editMode, setEditMode] = useState(false);
 
-  const onBack = () => {
-    navigation.goBack();
+  const checkParams = () => {
+    let id = null;
+    let data = {title: null, content: null, thumbnail: null};
+    if (route.params) {
+      setEditMode(true);
+      id = route.params.id;
+
+      const {title, content, thumbnail} = route.params.data;
+
+      setNewStory({title, content, thumbnail});
+    }
   };
 
   const onChange = (type, text) => {
@@ -153,12 +164,15 @@ const StoryEdit = () => {
     }
   };
 
+  useEffect(() => {
+    checkParams();
+  }, []);
+
   const {content, title, thumbnail} = newStory;
   return (
     <ScrollView style={{flex: 1, backgroundColor: Color.white}}>
       <KeyboardAvoidingView>
         <Header
-         
           onPress={() => {
             onGoBack();
           }}

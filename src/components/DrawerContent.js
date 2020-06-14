@@ -17,8 +17,8 @@ import {set, color} from 'react-native-reanimated';
 
 const userRef = firestore().collection('users');
 const userIcon = require('../../assets/icons/007-user-2.png');
-const logout = require('../../assets/icons/neons/001-logout.png');
-const home = require('../../assets/icons/neons/022-home.png');
+const logout = require('../../assets/icons/round_exit_to_app_black_48dp.png');
+const homeIcon = require('../../assets/icons/round_home_black_48dp.png');
 
 const styles = StyleSheet.create({
   header: {
@@ -75,7 +75,7 @@ const DrawerContent = (props) => {
           <Drawer.Item
             icon={({color, size}) => (
               <Image
-                source={logout}
+                source={homeIcon}
                 style={{width: 24, height: 24, opacity: 1}}
               />
             )}

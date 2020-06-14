@@ -70,7 +70,7 @@ const StoryDetails = ({route}) => {
   };
 
   const onEditStory = (id) => {
-    navigation.navigate('StoryEdit', {id});
+    navigation.navigate('StoryEdit', {id, data});
   };
   const sendComment = () => {
     const {comments} = data;
@@ -127,16 +127,18 @@ const StoryDetails = ({route}) => {
     <ScrollView contentContainerStyle={{flexGrow: 1}}>
       <View style={[styles.container]}>
         <Header
+          text="deoijdioedoiejdejodejdoiedoiecj"
           onPress={() => onGoBack()}
+          remove
           onDeletePress={() => onDeleteStory(id)}
-          onEditPress={() => onEditStory(id)}
+          //   edit
+          //   onEditPress={() => onEditStory(id)}
         />
         {thumbnail && (
           <View
             style={[
               {
-                height: 300,
-                backgroundColor: Color.lightGrey,
+                height: 250,
               },
             ]}>
             <Image
@@ -178,7 +180,7 @@ const StoryDetails = ({route}) => {
                       }}>
                       <Text
                         style={{
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: 'bold',
                           color: Color.darkGrey,
                         }}>
@@ -201,7 +203,7 @@ const StoryDetails = ({route}) => {
                     </Text>
                     <Text
                       style={{
-                        fontSize: 16,
+                        fontSize: 14,
                         color: Color.darkGrey,
                       }}>
                       {comment}
