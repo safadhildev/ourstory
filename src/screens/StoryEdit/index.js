@@ -132,7 +132,7 @@ const StoryEdit = () => {
     }
     await ref
       .doc(key)
-      .set({title, content, date, thumbnail: thumbnailUrl})
+      .set({title, content, date, thumbnail: thumbnailUrl, comments: []})
       .then(() => {
         console.log('success');
         setLoading(false);
@@ -217,17 +217,20 @@ const StoryEdit = () => {
             </View>
           </TouchableOpacity>
         </View>
-        <Input
-          value={title}
-          onChangeText={(text) => onChange('title', text)}
-          placeholder="Title"
-        />
-        <Input
-          value={content}
-          onChangeText={(text) => onChange('content', text)}
-          placeholder="Say something ..."
-          multiline={true}
-        />
+        <View style={{paddingHorizontal: 20}}>
+          <Input
+            value={title}
+            onChangeText={(text) => onChange('title', text)}
+            placeholder="Title"
+          />
+          <Input
+            value={content}
+            onChangeText={(text) => onChange('content', text)}
+            placeholder="Say something ..."
+            multiline={true}
+            lines={10}
+          />
+        </View>
         <View
           style={{
             margin: 20,
