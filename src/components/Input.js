@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Text,
   View,
@@ -12,10 +12,11 @@ import ImagePicker from 'react-native-image-picker';
 
 const bold = require('../../assets/icons/bold.png');
 const image = require('../../assets/icons/photo.png');
+const sendIcon = require('../../assets/icons/neons/021-sent.png');
 
 const styles = StyleSheet.create({
   inputWrapper: {
-    marginHorizontal: 20,
+    //marginHorizontal: 20,
     marginVertical: 5,
     backgroundColor: Color.lightGrey,
     justifyContent: 'center',
@@ -39,7 +40,15 @@ const styles = StyleSheet.create({
   },
 });
 
-const Input = ({value, onChangeText, multiline, onPressImage, placeholder}) => {
+const Input = ({
+  value,
+  onChangeText,
+  multiline,
+  onPressImage,
+  placeholder,
+  send,
+  lines,
+}) => {
   const [toggleBold, setToggleBold] = useState(false);
 
   const onToggle = (type) => {
@@ -82,6 +91,9 @@ const Input = ({value, onChangeText, multiline, onPressImage, placeholder}) => {
       </View>
     );
   };
+
+  useEffect(() => {});
+
   return (
     <View style={styles.inputWrapper}>
       <View>
@@ -91,8 +103,24 @@ const Input = ({value, onChangeText, multiline, onPressImage, placeholder}) => {
           value={value}
           onChangeText={onChangeText}
           multiline={multiline}
-          numberOfLines={multiline && 10}
+          numberOfLines={lines}
         />
+        {/* {send && value && (
+          <View
+            style={{
+              width: 30,
+              height: 30,
+              position: 'absolute',
+              right: 10,
+              bottom: 10,
+            }}>
+            <Image
+              source={sendIcon}
+              style={{width: '100%', height: '100%'}}
+              resizeMode="contain"
+            />
+          </View>
+        )} */}
       </View>
     </View>
   );

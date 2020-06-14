@@ -1,5 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, SafeAreaView, FlatList, ScrollView} from 'react-native';
+import {
+  View,
+  Text,
+  SafeAreaView,
+  FlatList,
+  ScrollView,
+  StatusBar,
+} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 import firebase from '@react-native-firebase/app';
@@ -13,16 +20,6 @@ import Color from '../../components/Color';
 
 const ref = firestore().collection('stories');
 
-const customData = [
-  {
-    title: 'TITLE 101',
-    content: 'weiojdoiwedoijwe',
-  },
-  {
-    title: 'TITLE 333',
-    content: 'weiojdoiwedoijwe',
-  },
-];
 const Home = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -36,36 +33,20 @@ const Home = () => {
     navigation.navigate('StoryEdit');
   };
 
-  const renderStories = (item, index) => {
-    const {title, content, thumbnail} = item;
-    const last = data.length - 1;
-
-    console.log({thumbnail});
-
-    return (
-      <Card
-        thumbnail={thumbnail}
-        title={title}
-        onPress={() => {
-          alert('diehdieihd');
-        }}
-        last={index === last ? true : false}
-      />
-    );
-  };
-
   const collectionUpdate = (querySnapshot) => {
     const documents = [];
     querySnapshot.forEach((doc) => {
-      const {title, content, thumbnail} = doc.data();
+      const {title, content, thumbnail, date} = doc.data();
       const dataObj = {
         id: doc.id,
         title,
         content,
         thumbnail,
+        date,
       };
       documents.push(dataObj);
     });
+    documents.sort((a, b) => b.id - a.id);
     setData(documents);
     setLoading(false);
   };
@@ -77,6 +58,21 @@ const Home = () => {
 
     return () => subs;
   }, []);
+  const renderStories = (item, index) => {
+    const {title, content, thumbnail} = item;
+    const last = data.length - 1;
+
+    return (
+      <Card
+        thumbnail={thumbnail}
+        title={title}
+        onPress={() => {
+          navigation.navigate('StoryDetails', {item, id: item.id});
+        }}
+        last={index === last ? true : false}
+      />
+    );
+  };
 
   return (
     <View style={styles.container}>
