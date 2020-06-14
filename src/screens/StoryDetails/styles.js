@@ -13,8 +13,12 @@ const styles = StyleSheet.create({
   thumbnailWrapper: {
     width: '100%',
   },
+  uploaderText: {
+    fontSize: 12,
+    color: color.blue,
+  },
   headerText: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     color: Color.black,
   },

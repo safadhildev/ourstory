@@ -1,5 +1,6 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, TouchableOpacity, Text, Image, StyleSheet} from 'react-native';
+import firestore from '@react-native-firebase/firestore';
 import Color from './Color';
 
 const commentBlack = require('../../assets/icons/comment_black_24dp.png');
@@ -46,7 +47,41 @@ const styles = StyleSheet.create({
 
 const img = require('../../assets/image/testimg.jpg');
 
-const Card = ({title, content, onPress, comments, last, thumbnail}) => {
+const Card = ({
+  title,
+  content,
+  onPress,
+  comments,
+  last,
+  thumbnail,
+  uploader,
+  commentsCount,
+  date,
+}) => {
+  const [user, setUser] = useState({name: null, image: null});
+  const getUploader = async () => {
+    const userRef = await firestore().collection('users').doc(uploader).get();
+    // console.log({uploader});
+
+    if (userRef.exists) {
+      console.log({userRef});
+
+      const {name, image} = userRef.data();
+      setUser({
+        name,
+        image,
+        id: uploader,
+      });
+    }
+  };
+
+  useEffect(() => {
+    try {
+      getUploader();
+    } catch (err) {
+      console.log({err});
+    }
+  }, []);
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -61,8 +96,11 @@ const Card = ({title, content, onPress, comments, last, thumbnail}) => {
             paddingVertical: 5,
             alignItems: 'center',
           }}>
-          <Image source={userBlack} style={{width: 30, height: 30}} />
-          <Text style={{paddingLeft: 10}}>User</Text>
+          <Image
+            source={user.image ? {uri: user.image} : userBlack}
+            style={{width: 30, height: 30}}
+          />
+          <Text style={{paddingLeft: 10}}>{user.id}</Text>
         </View>
         <View style={styles.imageWrapper}>
           <Image
@@ -83,7 +121,7 @@ const Card = ({title, content, onPress, comments, last, thumbnail}) => {
             style={{
               flexDirection: 'row',
             }}>
-            <Text style={{paddingHorizontal: 5}}>1</Text>
+            <Text style={{paddingHorizontal: 5}}>{commentsCount}</Text>
             <View
               style={{
                 width: 24,

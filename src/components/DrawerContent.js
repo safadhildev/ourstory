@@ -14,6 +14,7 @@ import firestore from '@react-native-firebase/firestore';
 import Color from './Color';
 import {useNavigation} from '@react-navigation/native';
 import {set, color} from 'react-native-reanimated';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const userRef = firestore().collection('users');
 const userIcon = require('../../assets/icons/007-user-2.png');
@@ -32,13 +33,31 @@ const DrawerContent = (props) => {
   const [user, setUser] = useState({});
 
   const getUserDetails = async () => {
-    const results = await userRef.doc('23021995').get();
-    console.log({user});
+    try {
+      const username = await AsyncStorage.getItem('username');
+      console.log({username});
 
-    if (results.exists) {
-      setUser(results.data());
+      if (username !== null) {
+        const results = await userRef.doc(username).get();
+        if (results.exists) {
+          setUser({...results.data(), id: results.id});
+        }
+      }
+    } catch (e) {
+      console.log('Error getting user', e);
     }
+    console.log({user});
   };
+
+  const onLogout = async () => {
+    try {
+      await AsyncStorage.clear();
+    } catch (e) {
+      // clear error
+    }
+    navigation.navigate('Login');
+  };
+
   useEffect(() => {
     // const subs = userRef.onSnapshot((snapshot) => {
     //   collectionUpdate(snapshot);
@@ -49,26 +68,23 @@ const DrawerContent = (props) => {
     getUserDetails();
   }, []);
 
-  const navigateTo = (item) => {
-    navigation.navigate(item);
+  const navigateTo = (item, param) => {
+    navigation.navigate(item, {param});
   };
 
-  const {name} = user;
+  const {name, id, image} = user;
   return (
     <View style={{flex: 1}}>
       <DrawerContentScrollView {...props}>
         <Drawer.Section>
           <View style={styles.header}>
             <Avatar.Image
-              source={userIcon}
+              source={image ? {uri: image} : userIcon}
               style={{backgroundColor: Color.lightGrey}}
-              onPress={() => {
-                Alert.alert('Alert', 'User');
-              }}
             />
             <View>
               <Title>{name}</Title>
-              <Caption>@fadhil232</Caption>
+              <Caption>@{id}</Caption>
             </View>
           </View>
         </Drawer.Section>
@@ -94,7 +110,7 @@ const DrawerContent = (props) => {
             )}
             label="Profile"
             onPress={() => {
-              navigateTo('Profile');
+              navigateTo('Profile', user);
             }}
           />
         </Drawer.Section>
@@ -108,6 +124,9 @@ const DrawerContent = (props) => {
               style={{width: 24, height: 24, opacity: 1}}
             />
           )}
+          onPress={() => {
+            onLogout();
+          }}
         />
       </Drawer.Section>
     </View>

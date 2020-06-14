@@ -12,6 +12,7 @@ import firestore from '@react-native-firebase/firestore';
 import firebase from '@react-native-firebase/app';
 import storage from '@react-native-firebase/storage';
 import {utils} from '@react-native-firebase/app';
+import AsyncStorage from '@react-native-community/async-storage';
 import moment from 'moment';
 import Header from '../../components/Header';
 import Input from '../../components/Input';
@@ -35,17 +36,28 @@ const options = {
     skipBackup: true,
   },
 };
+
 const StoryEdit = ({route}) => {
   const [newStory, setNewStory] = useState({
     title: null,
     content: null,
     thumbnail: null,
+    uploader: null,
   });
-
   const [loading, setLoading] = useState(false);
   const [components, setComponents] = useState([]);
   const navigation = useNavigation();
+  const [username, setUsername] = useState(null);
   const [editMode, setEditMode] = useState(false);
+
+  const getUser = async () => {
+    try {
+      const id = await AsyncStorage.getItem('username');
+      setUsername(id);
+    } catch (e) {
+      // read error
+    }
+  };
 
   const checkParams = () => {
     let id = null;
@@ -120,7 +132,7 @@ const StoryEdit = ({route}) => {
   };
 
   const onGoBack = () => {
-    setNewStory({title: null, content: null, thumbnail: null});
+    setNewStory({title: null, content: null, thumbnail: null, uploader: null});
     navigation.goBack();
   };
 
@@ -149,7 +161,7 @@ const StoryEdit = ({route}) => {
         date,
         thumbnail: thumbnailUrl,
         comments: [],
-        uploader: '23021995',
+        uploader: username,
       })
       .then(() => {
         console.log('success');
@@ -173,6 +185,10 @@ const StoryEdit = ({route}) => {
 
   useEffect(() => {
     checkParams();
+  }, []);
+
+  useEffect(() => {
+    getUser();
   }, []);
 
   const {content, title, thumbnail} = newStory;

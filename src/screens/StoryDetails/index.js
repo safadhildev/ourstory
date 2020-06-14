@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import Header from '../../components/Header';
 import {useNavigation, useNavigationParam} from '@react-navigation/native';
+import AsyncStorage from '@react-native-community/async-storage';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import styles from './styles';
@@ -24,11 +25,14 @@ const deleteIcon = require('../../../assets/icons/round_delete_black_24dp.png');
 
 const StoryDetails = ({route}) => {
   const {id} = route.params;
+  const [currentUser, setCurrentUser] = useState(null);
   const [data, setData] = useState({
     title: null,
     content: null,
     thumbnail: null,
     date: null,
+    comments: [],
+    uploader: null,
   });
 
   const [newComment, setNewComment] = useState(null);
@@ -43,16 +47,33 @@ const StoryDetails = ({route}) => {
     navigation.goBack();
   };
 
+  const getUser = async () => {
+    try {
+      const current = await AsyncStorage.getItem('username');
+      setCurrentUser(current);
+    } catch (err) {
+      console.log('StoryDetails - getUser', err);
+    }
+  };
   const getData = (snapshot) => {
     try {
-      const {title, thumbnail, date, comments, content} = snapshot.data();
+      console.log({snapshot});
 
+      const {
+        title,
+        thumbnail,
+        date,
+        comments,
+        content,
+        uploader,
+      } = snapshot.data();
       if (comments) {
         comments.reverse();
       }
-      setData({title, thumbnail, comments, date, content});
+
+      setData({title, thumbnail, date, content, comments, uploader});
     } catch (err) {
-      console.log({err});
+      console.log('Story Details - getData()', err);
     }
   };
 
@@ -79,15 +100,17 @@ const StoryDetails = ({route}) => {
   const onEditStory = (id) => {
     navigation.navigate('StoryEdit', {id, data});
   };
-  const sendComment = () => {
+  const sendComment = async () => {
     const {comments} = data;
+    console.log({comments});
 
     try {
       const docRef = firestore().collection('stories').doc(id);
+
       if (newComment) {
         comments.push({
           id: moment().unix().toString(),
-          user: 'Crap Bag',
+          user: currentUser,
           comment: newComment.trim(),
           date: moment().format('LLLL'),
         });
@@ -101,7 +124,7 @@ const StoryDetails = ({route}) => {
           });
       }
     } catch (error) {
-      console.log({error});
+      console.log('StoryDetails - sendComment', error);
     }
   };
 
@@ -128,19 +151,22 @@ const StoryDetails = ({route}) => {
     }
   }, []);
 
-  const {title, content, thumbnail, date, comments} = data;
+  useEffect(() => {
+    getUser();
+  }, []);
+
+  const {title, content, thumbnail, date, comments, uploader} = data;
 
   return (
-    <ScrollView contentContainerStyle={{flexGrow: 1}}>
-      <View style={[styles.container]}>
-        <Header
-          text="deoijdioedoiejdejodejdoiedoiecj"
-          onPress={() => onGoBack()}
-          remove
-          onDeletePress={() => onDeleteStory(id)}
-          //   edit
-          //   onEditPress={() => onEditStory(id)}
-        />
+    <View style={[styles.container]}>
+      <Header
+        onPress={() => onGoBack()}
+        remove
+        onDeletePress={() => onDeleteStory(id)}
+        //   edit
+        //   onEditPress={() => onEditStory(id)}
+      />
+      <ScrollView contentContainerStyle={{flexGrow: 1}}>
         {thumbnail && (
           <View
             style={[
@@ -156,6 +182,7 @@ const StoryDetails = ({route}) => {
           </View>
         )}
         <View style={{padding: 20}}>
+          <Text style={styles.uploaderText}>@{uploader}</Text>
           <View style={{flexDirection: 'row'}}>
             <Text style={styles.headerText} allowFontScaling={false}>
               {title}
@@ -164,7 +191,9 @@ const StoryDetails = ({route}) => {
           <Text style={styles.dateText} allowFontScaling={false}>
             {date}
           </Text>
-          <Text style={styles.contentText}>{content}</Text>
+          <Text style={styles.contentText} allowFontScaling={false}>
+            {content}
+          </Text>
 
           <View style={styles.commentSection}>
             <Text style={{color: Color.darkGrey}}>Comments</Text>
@@ -230,19 +259,20 @@ const StoryDetails = ({route}) => {
                 onPress={() => {
                   sendComment();
                 }}
+                onSendPress={() => sendComment()}
               />
-              <View style={{alignItems: 'flex-end'}}>
+              {/* <View style={{alignItems: 'flex-end'}}>
                 <Button
                   text="Send"
                   onPress={() => sendComment()}
                   disabled={newComment ? false : true}
                 />
-              </View>
+              </View> */}
             </View>
           </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 

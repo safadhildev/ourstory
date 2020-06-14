@@ -11,6 +11,7 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import firebase from '@react-native-firebase/app';
 import firestore from '@react-native-firebase/firestore';
+import AsyncStorage from '@react-native-community/async-storage';
 import Button from '../../components/Button';
 import Header from '../../components/Header';
 import Card from '../../components/Card';
@@ -24,6 +25,7 @@ const Home = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
+  const [user, setUser] = useState({name: null, image: null, username: null});
 
   const onOpenDrawer = () => {
     navigation.openDrawer();
@@ -36,13 +38,17 @@ const Home = () => {
   const collectionUpdate = (querySnapshot) => {
     const documents = [];
     querySnapshot.forEach((doc) => {
-      const {title, content, thumbnail, date} = doc.data();
+      const {title, content, thumbnail, date, uploader, comments} = doc.data();
+      console.log('dede', doc.data());
+
       const dataObj = {
         id: doc.id,
         title,
         content,
         thumbnail,
         date,
+        uploader,
+        comments,
       };
       documents.push(dataObj);
     });
@@ -58,12 +64,16 @@ const Home = () => {
 
     return () => subs;
   }, []);
+
   const renderStories = (item, index) => {
-    const {title, content, thumbnail} = item;
+    const {title, content, thumbnail, uploader, date, comments} = item;
     const last = data.length - 1;
 
     return (
       <Card
+        commentsCount={comments.length}
+        uploader={uploader && uploader}
+        date={date}
         thumbnail={thumbnail}
         title={title}
         onPress={() => {

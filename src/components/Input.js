@@ -23,6 +23,7 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   input: {
+    flex: 1,
     textAlignVertical: 'top',
     padding: 10,
   },
@@ -48,6 +49,9 @@ const Input = ({
   placeholder,
   send,
   lines,
+  center,
+  bold,
+  onSendPress,
 }) => {
   const [toggleBold, setToggleBold] = useState(false);
 
@@ -96,31 +100,41 @@ const Input = ({
 
   return (
     <View style={styles.inputWrapper}>
-      <View>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            center && {textAlign: 'center'},
+            bold && {fontWeight: 'bold', fontSize: 24},
+          ]}
           placeholder={placeholder}
           value={value}
           onChangeText={onChangeText}
           multiline={multiline}
           numberOfLines={lines}
         />
-        {/* {send && value && (
-          <View
-            style={{
-              width: 30,
-              height: 30,
-              position: 'absolute',
-              right: 10,
-              bottom: 10,
-            }}>
-            <Image
-              source={sendIcon}
-              style={{width: '100%', height: '100%'}}
-              resizeMode="contain"
-            />
-          </View>
-        )} */}
+        {send && (
+          <TouchableOpacity
+            onPress={onSendPress}
+            disabled={value ? false : true}>
+            <View
+              style={{
+                width: 30,
+                height: 30,
+              }}>
+              <Image
+                source={sendIcon}
+                style={{width: '100%', height: '100%'}}
+                resizeMode="contain"
+              />
+            </View>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
