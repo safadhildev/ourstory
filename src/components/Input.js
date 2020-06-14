@@ -12,7 +12,7 @@ import ImagePicker from 'react-native-image-picker';
 
 const bold = require('../../assets/icons/bold.png');
 const image = require('../../assets/icons/photo.png');
-const sendIcon = require('../../assets/icons/neons/021-sent.png');
+const sendIcon = require('../../assets/icons/round_send_black_24dp.png');
 
 const styles = StyleSheet.create({
   inputWrapper: {

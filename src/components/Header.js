@@ -2,20 +2,24 @@ import React from 'react';
 import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import Hamburger from './Hamburger';
 import color from './Color';
+import Color from './Color';
 
 const drawerBlack = require('../../assets/icons/menu_black_24dp.png');
 const drawerWhite = require('../../assets/icons/menu_white_24dp.png');
-const backBlack = require('../../assets/icons/back.png');
+const backBlack = require('../../assets/icons/round_arrow_back_black_48dp.png');
+const editIcon = require('../../assets/icons/round_edit_black_24dp.png');
+const deleteIcon = require('../../assets/icons/round_delete_black_24dp.png');
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 15,
     alignItems: 'center',
   },
   text: {
-    flex: 1,
+    flex: 3,
     paddingHorizontal: 20,
     fontSize: 24,
     fontWeight: 'bold',
@@ -32,7 +36,15 @@ const styles = StyleSheet.create({
   },
 });
 
-const Header = ({text, onPress, menu}) => {
+const Header = ({
+  text,
+  onPress,
+  menu,
+  edit,
+  remove,
+  onDeletePress,
+  onEditPress,
+}) => {
   const selectMenuType = () => {
     switch (menu) {
       case 'drawer':
@@ -52,9 +64,29 @@ const Header = ({text, onPress, menu}) => {
           />
         </View>
       </TouchableOpacity>
-      <Text style={styles.text} allowFontScaling={false}>
+      <Text
+        style={styles.text}
+        allowFontScaling={false}
+        numberOfLines={1}
+        ellipsizeMode="tail">
         {text}
       </Text>
+      {edit && (
+        <TouchableOpacity onPress={onEditPress}>
+          <Image
+            source={editIcon}
+            style={{width: 24, height: 24, marginHorizontal: 10}}
+          />
+        </TouchableOpacity>
+      )}
+      {remove && (
+        <TouchableOpacity onPress={onDeletePress}>
+          <Image
+            source={deleteIcon}
+            style={{width: 24, height: 24, marginLeft: 10}}
+          />
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

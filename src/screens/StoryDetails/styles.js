@@ -14,16 +14,16 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   headerText: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
     color: Color.black,
   },
   dateText: {
-    fontSize: 12,
+    fontSize: 10,
     color: Color.grey,
   },
   contentText: {
-    fontSize: 18,
+    fontSize: 14,
     paddingVertical: 20,
   },
   commentSection: {
