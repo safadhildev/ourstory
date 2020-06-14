@@ -158,6 +158,7 @@ const StoryEdit = () => {
     <ScrollView style={{flex: 1, backgroundColor: Color.white}}>
       <KeyboardAvoidingView>
         <Header
+         
           onPress={() => {
             onGoBack();
           }}

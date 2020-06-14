@@ -7,6 +7,7 @@ import {
   Image,
   ScrollView,
   FlatList,
+  Platform,
 } from 'react-native';
 import Header from '../../components/Header';
 import {useNavigation, useNavigationParam} from '@react-navigation/native';
@@ -17,59 +18,70 @@ import Color from '../../components/Color';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import moment from 'moment';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 
-const commentsEx = [
-  {
-    user: 'fadhil',
-    comment: 'muehehehe',
-    date: moment().format('LLLL'),
-  },
-  {
-    user: 'fadhil',
-    comment: 'muehdqwdqwdqwehehe',
-    date: moment().format('LLLL'),
-  },
-  {
-    user: 'fadhil',
-    comment: 'wdqdhehe',
-    date: moment().format('LLLL'),
-  },
-  {
-    user: 'fadhil',
-    comment: 'muehehehe',
-    date: moment().format('LLLL'),
-  },
-];
-const StoryDetails = ({route, navigation}) => {
+const deleteIcon = require('../../../assets/icons/round_delete_black_24dp.png');
+
+const StoryDetails = ({route}) => {
   const {id} = route.params;
-  const [data, setData] = useState({});
+  const [data, setData] = useState({
+    title: null,
+    content: null,
+    thumbnail: null,
+    date: null,
+  });
+
   const [newComment, setNewComment] = useState(null);
   const [dimension, setDimension] = useState({
     width: null,
     height: null,
     ratio: 1,
   });
-
-  const getData = (snapshot) => {
-    //console.log({snapshot});
-    setData(snapshot.data());
-    const {title, thumbnail, date, comments, content} = snapshot.data();
-    comments.reverse();
-    setData({title, thumbnail, comments, date, content});
-  };
+  const navigation = useNavigation();
 
   const onGoBack = () => {
     navigation.goBack();
   };
 
+  const getData = (snapshot) => {
+    try {
+      const {title, thumbnail, date, comments, content} = snapshot.data();
+
+      if (comments) {
+        comments.reverse();
+      }
+      setData({title, thumbnail, comments, date, content});
+    } catch (err) {
+      console.log({err});
+    }
+  };
+
+  const onDeleteStory = (id) => {
+    const docRef = firestore().collection('stories').doc(id);
+    docRef
+      .delete()
+      .then(() => {
+        console.log('Story Deleted');
+        navigation.goBack();
+      })
+      .catch((error) => {
+        console.log('Error', error);
+      });
+  };
+
+  const onEditStory = (id) => {
+    navigation.navigate('StoryEdit', {id});
+  };
   const sendComment = () => {
     const {comments} = data;
+
     try {
       const docRef = firestore().collection('stories').doc(id);
       if (newComment) {
         comments.push({
+          id: moment().unix().toString(),
           user: 'Crap Bag',
-          comment: newComment,
+          comment: newComment.trim(),
           date: moment().format('LLLL'),
         });
         docRef
@@ -84,6 +96,17 @@ const StoryDetails = ({route, navigation}) => {
     } catch (error) {
       console.log({error});
     }
+  };
+
+  const onDeleteComment = async (commentId) => {
+    console.log({commentId});
+    const docRef = firestore().collection('stories').doc(id);
+
+    const filterComments = data.comments.filter(
+      (item) => item.id !== commentId,
+    );
+
+    docRef.update({comments: filterComments});
   };
 
   useEffect(() => {
@@ -103,7 +126,11 @@ const StoryDetails = ({route, navigation}) => {
   return (
     <ScrollView contentContainerStyle={{flexGrow: 1}}>
       <View style={[styles.container]}>
-        <Header onPress={() => onGoBack()} />
+        <Header
+          onPress={() => onGoBack()}
+          onDeletePress={() => onDeleteStory(id)}
+          onEditPress={() => onEditStory(id)}
+        />
         {thumbnail && (
           <View
             style={[
@@ -134,8 +161,7 @@ const StoryDetails = ({route, navigation}) => {
             <Text style={{color: Color.darkGrey}}>Comments</Text>
             {comments &&
               comments.map((item) => {
-                const {user, comment, date} = item;
-                console.log(item);
+                const {user, comment, date, id} = item;
 
                 return (
                   <View
@@ -158,11 +184,26 @@ const StoryDetails = ({route, navigation}) => {
                         }}>
                         {user}
                       </Text>
-                      <Text style={{fontSize: 10, color: Color.grey}}>
-                        {moment(date).format('llll')}
-                      </Text>
+                      <TouchableOpacity
+                        onPress={() => {
+                          onDeleteComment(id);
+                        }}>
+                        <View>
+                          <Image
+                            source={deleteIcon}
+                            style={{width: 24, height: 24}}
+                          />
+                        </View>
+                      </TouchableOpacity>
                     </View>
-                    <Text style={{fontSize: 16, color: Color.darkGrey}}>
+                    <Text style={{fontSize: 10, color: Color.grey}}>
+                      {moment(date).format('llll')}
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        color: Color.darkGrey,
+                      }}>
                       {comment}
                     </Text>
                   </View>
