@@ -143,7 +143,14 @@ const StoryEdit = ({route}) => {
     }
     await ref
       .doc(key)
-      .set({title, content, date, thumbnail: thumbnailUrl, comments: []})
+      .set({
+        title,
+        content,
+        date,
+        thumbnail: thumbnailUrl,
+        comments: [],
+        uploader: '23021995',
+      })
       .then(() => {
         console.log('success');
         setLoading(false);

@@ -56,8 +56,15 @@ const StoryDetails = ({route}) => {
     }
   };
 
-  const onDeleteStory = (id) => {
+  const onDeleteStory = async (id) => {
     const docRef = firestore().collection('stories').doc(id);
+    let thumbnailRef = null;
+
+    if (data.thumbnail) {
+      thumbnailRef = storage().refFromURL(data.thumbnail).path;
+
+      await storage().ref(thumbnailRef).delete();
+    }
     docRef
       .delete()
       .then(() => {

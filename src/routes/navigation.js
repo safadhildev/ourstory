@@ -17,6 +17,7 @@ import Login from '../screens/Login';
 import Home from '../screens/Home';
 import StoryEdit from '../screens/StoryEdit';
 import StoryDetails from '../screens/StoryDetails';
+import Profile from '../screens/Profile';
 
 const styles = StyleSheet.create({
   drawer: {
@@ -24,24 +25,6 @@ const styles = StyleSheet.create({
     padding: 0,
   },
 });
-
-const CustomDrawerContent = (props) => {
-  return (
-    <DrawerContentScrollView {...props}>
-      <View>
-        <Text>Hello</Text>
-      </View>
-      <DrawerItem
-        label="Fadhil"
-        onPress={() => Linking.openURL('https://mywebsite.com/help')}
-        style={{
-          backgroundColor: '#000',
-        }}
-      />
-      <DrawerItemList {...props} />
-    </DrawerContentScrollView>
-  );
-};
 
 const MainStack = createStackNavigator();
 const HomeStack = () => {
@@ -79,6 +62,7 @@ const stack = () => {
         <rootStack.Screen name="Home" component={HomeDrawer} />
         <rootStack.Screen name="StoryEdit" component={StoryEdit} />
         <rootStack.Screen name="StoryDetails" component={StoryDetails} />
+        <rootStack.Screen name="Profile" component={Profile} />
       </rootStack.Navigator>
     </NavigationContainer>
   );

@@ -19,6 +19,7 @@ const userRef = firestore().collection('users');
 const userIcon = require('../../assets/icons/007-user-2.png');
 const logout = require('../../assets/icons/round_exit_to_app_black_48dp.png');
 const homeIcon = require('../../assets/icons/round_home_black_48dp.png');
+const profileIcon = require('../../assets/icons/round_person_black_48dp.png');
 
 const styles = StyleSheet.create({
   header: {
@@ -82,6 +83,18 @@ const DrawerContent = (props) => {
             label="Home"
             onPress={() => {
               navigateTo('Home');
+            }}
+          />
+          <Drawer.Item
+            icon={({color, size}) => (
+              <Image
+                source={profileIcon}
+                style={{width: 24, height: 24, opacity: 1}}
+              />
+            )}
+            label="Profile"
+            onPress={() => {
+              navigateTo('Profile');
             }}
           />
         </Drawer.Section>
