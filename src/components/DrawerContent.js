@@ -50,12 +50,31 @@ const DrawerContent = (props) => {
   };
 
   const onLogout = async () => {
-    try {
-      await AsyncStorage.clear();
-    } catch (e) {
-      // clear error
-    }
-    navigation.navigate('Login');
+    Alert.alert(
+      'Alert',
+      'Confirm Logout?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => {
+            console.log('cancel');
+          },
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: async () => {
+            try {
+              await AsyncStorage.clear();
+            } catch (e) {
+              // clear error
+            }
+            navigation.navigate('Login');
+          },
+        },
+      ],
+      {cancelable: false},
+    );
   };
 
   useEffect(() => {

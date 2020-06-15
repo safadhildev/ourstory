@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -46,6 +46,21 @@ const Login = () => {
       // saving error
     }
   };
+
+  const checkUser = async () => {
+    try {
+      const user = await AsyncStorage.getItem('username');
+      if (user) {
+        navigate('Home');
+      }
+    } catch (err) {
+      console.log('Login - checkUser() => ', err);
+    }
+  };
+
+  useEffect(() => {
+    checkUser();
+  }, []);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>

@@ -6,6 +6,8 @@ import {
   FlatList,
   ScrollView,
   StatusBar,
+  Alert,
+  BackHandler,
 } from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
@@ -63,6 +65,37 @@ const Home = () => {
     });
 
     return () => subs;
+  }, []);
+
+  useEffect(() => {
+    const backAction = () => {
+      Alert.alert('Exit', 'Are you sure?', [
+        {
+          text: 'Cancel',
+          onPress: () => null,
+          style: 'cancel',
+        },
+        {
+          text: 'YES',
+          onPress: async () => {
+            try {
+              // await AsyncStorage.clear();
+              BackHandler.exitApp();
+            } catch (err) {
+              console.log('Home - useEffect =>', err);
+            }
+          },
+        },
+      ]);
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => backHandler.remove();
   }, []);
 
   const renderStories = (item, index) => {
