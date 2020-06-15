@@ -6,6 +6,8 @@ import {
   KeyboardAvoidingView,
   Alert,
   Keyboard,
+  Image,
+  ScrollView,
 } from 'react-native';
 import styles from './styles';
 import {
@@ -17,6 +19,8 @@ import Button from '../../components/Button';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-community/async-storage';
 import Input from '../../components/Input';
+
+const welcomeImage = require('../../../assets/image/welcome.jpg');
 
 const Login = () => {
   const {navigate} = useNavigation();
@@ -44,26 +48,35 @@ const Login = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <TouchableWithoutFeedback
-        onPress={Keyboard.dismiss}
-        style={styles.container}>
-        <View style={{width: 350, padding: 30}}>
-          <Input
-            placeholder="username"
-            value={username}
-            onChangeText={(text) => {
-              setUsername(text);
-            }}
-            bold
-            send
-            onSendPress={() => {
-              onLogin();
+    <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.container}>
+        <KeyboardAvoidingView>
+          <Image
+            source={welcomeImage}
+            style={{
+              width: 300,
+              height: 300,
+              backgroundColor: '#000',
+              alignSelf: 'center',
             }}
           />
-        </View>
-      </TouchableWithoutFeedback>
-    </View>
+          <View style={{width: 350, padding: 30}}>
+            <Input
+              placeholder="Username"
+              value={username}
+              onChangeText={(text) => {
+                setUsername(text);
+              }}
+              bold
+              send
+              onSendPress={() => {
+                onLogin();
+              }}
+            />
+          </View>
+        </KeyboardAvoidingView>
+      </View>
+    </ScrollView>
   );
 };
 

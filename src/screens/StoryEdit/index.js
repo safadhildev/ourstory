@@ -44,11 +44,19 @@ const StoryEdit = ({route}) => {
     thumbnail: null,
     uploader: null,
   });
+  const [story, setStory] = useState({
+    id: null,
+    title: null,
+    content: null,
+    thumbnail: null,
+    uploader: null,
+  });
   const [loading, setLoading] = useState(false);
   const [components, setComponents] = useState([]);
   const navigation = useNavigation();
   const [username, setUsername] = useState(null);
   const [editMode, setEditMode] = useState(false);
+  const [storyThumbnail, setStoryThumbnail] = useState(null);
 
   const getUser = async () => {
     try {
@@ -61,14 +69,14 @@ const StoryEdit = ({route}) => {
 
   const checkParams = () => {
     let id = null;
-    let data = {title: null, content: null, thumbnail: null};
     if (route.params) {
       setEditMode(true);
       id = route.params.id;
 
       const {title, content, thumbnail} = route.params.data;
-
       setNewStory({title, content, thumbnail});
+      setStory({id, title, thumbnail, content});
+      setEditMode(true);
     }
   };
 
@@ -103,9 +111,6 @@ const StoryEdit = ({route}) => {
       } else {
         const source = {uri: response.uri};
         const {fileName, height, width} = response;
-        console.log({fileName});
-
-        console.log({source});
 
         // You can also display the image using data:
         // let source = { uri: 'data:image/jpeg;base64,' + response.data };
@@ -125,14 +130,78 @@ const StoryEdit = ({route}) => {
   };
 
   const onRemoveThumbnail = () => {
-    setNewStory({
-      ...newStory,
-      thumbnail: null,
-    });
+    Alert.alert(
+      'Alert',
+      'Remove Image?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: () => {
+            setNewStory({
+              ...newStory,
+              thumbnail: null,
+            });
+          },
+        },
+      ],
+      {cancelable: false},
+    );
   };
 
   const onGoBack = () => {
-    setNewStory({title: null, content: null, thumbnail: null, uploader: null});
+    const {title, thumbnail, content} = story;
+    const newThumbnailType = typeof newStory.thumbnail;
+    console.log(newThumbnailType);
+
+    if (
+      title !== newStory.title ||
+      content !== newStory.content ||
+      (thumbnail === null && newStory.thumbnail !== null) ||
+      (thumbnail !== null && newStory.thumbnail === null) ||
+      (typeof thumbnail === 'string' && newThumbnailType === 'object')
+    ) {
+      Alert.alert(
+        'Discard All Changes?',
+        'You have unsaved changes that will be lost',
+        [
+          {
+            text: 'Cancel',
+            onPress: () => console.log('Cancel Pressed'),
+            style: 'cancel',
+          },
+          {
+            text: 'OK',
+            onPress: () => {
+              onConfirmBack();
+            },
+          },
+        ],
+        {cancelable: false},
+      );
+    } else {
+      onConfirmBack();
+    }
+  };
+
+  const onConfirmBack = () => {
+    setNewStory({
+      title: null,
+      content: null,
+      thumbnail: null,
+      uploader: null,
+    });
+    setStory({
+      id: null,
+      title: null,
+      content: null,
+      thumbnail: null,
+      uploader: null,
+    });
     navigation.goBack();
   };
 
@@ -166,18 +235,89 @@ const StoryEdit = ({route}) => {
       .then(() => {
         console.log('success');
         setLoading(false);
-        onGoBack();
+        onConfirmBack();
       })
       .catch((err) => {
         console.log(err);
       });
   };
 
+  const onEditSubmit = async () => {
+    const date = moment().format('LLLL');
+    const {title, thumbnail, content} = newStory;
+    let thumbnailUrl = story.thumbnail;
+
+    try {
+      if (story.thumbnail !== thumbnail) {
+        //replace old one
+        if (story.thumbnail) {
+          const thumbnailRef = storage().refFromURL(story.thumbnail).path;
+          await storage().ref(thumbnailRef).delete();
+          thumbnailUrl = null;
+        }
+
+        if (thumbnail) {
+          const localUrl = thumbnail.uri.replace('file://', '');
+          const storageRef = storage().ref(
+            `/stories/${story.id}/thumbnail/${thumbnail.fileName}`,
+          );
+
+          await storageRef.putFile(localUrl);
+
+          thumbnailUrl = await storageRef.getDownloadURL();
+        }
+      }
+
+      await ref
+        .doc(story.id)
+        .update({
+          title,
+          content,
+          date,
+          thumbnail: thumbnailUrl,
+          uploader: username,
+        })
+        .then(() => {
+          console.log('success');
+          setLoading(false);
+          onConfirmBack();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } catch (err) {
+      console.log('StoryEdit - onEditSubmit() => ', err);
+    }
+  };
+
   const onValidate = () => {
     const {title, content} = newStory;
     if (title) {
-      setLoading(true);
-      onSubmit();
+      Alert.alert(
+        'Alert',
+        'Confirm submission?',
+        [
+          {
+            text: 'Cancel',
+            onPress: () => {
+              setLoading(false);
+            },
+            style: 'cancel',
+          },
+          {
+            text: 'OK',
+            onPress: () => {
+              setLoading(true);
+              if (editMode) {
+                onEditSubmit();
+              } else {
+                onSubmit();
+              }
+            },
+          },
+        ],
+        {cancelable: false},
+      );
     } else {
       Alert.alert('Error', "Title can't be empty");
     }
@@ -193,7 +333,11 @@ const StoryEdit = ({route}) => {
 
   const {content, title, thumbnail} = newStory;
   return (
-    <ScrollView style={{flex: 1, backgroundColor: Color.white}}>
+    <ScrollView
+      style={[
+        {flex: 1, backgroundColor: Color.white},
+        loading && {opacity: 0.5},
+      ]}>
       <KeyboardAvoidingView>
         <Header
           onPress={() => {
@@ -215,7 +359,17 @@ const StoryEdit = ({route}) => {
                 borderRadius: 1,
               }}>
               <Image
-                source={thumbnail ? {uri: thumbnail.uri} : placeholderImage}
+                source={
+                  editMode
+                    ? thumbnail
+                      ? thumbnail.uri
+                        ? {uri: thumbnail.uri}
+                        : {uri: thumbnail}
+                      : placeholderImage
+                    : thumbnail
+                    ? {uri: thumbnail.uri}
+                    : placeholderImage
+                }
                 resizeMode="contain"
                 style={{width: '100%', height: '100%'}}
               />
@@ -256,11 +410,13 @@ const StoryEdit = ({route}) => {
           </TouchableOpacity>
         </View>
         <View style={{paddingHorizontal: 20}}>
+          <Text style={{fontWeight: 'bold'}}>Title</Text>
           <Input
             value={title}
             onChangeText={(text) => onChange('title', text)}
             placeholder="Title"
           />
+          <Text style={{marginTop: 30, fontWeight: 'bold'}}>Message</Text>
           <Input
             value={content}
             onChangeText={(text) => onChange('content', text)}
@@ -276,7 +432,15 @@ const StoryEdit = ({route}) => {
           }}>
           <Button
             disabled={loading}
-            text={loading ? 'Uploading...' : 'Upload'}
+            text={
+              editMode
+                ? loading
+                  ? 'Upadating...'
+                  : 'Update'
+                : loading
+                ? 'Uploading...'
+                : 'Upload'
+            }
             onPress={() => {
               onValidate();
             }}

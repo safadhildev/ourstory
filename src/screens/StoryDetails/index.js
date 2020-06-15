@@ -8,6 +8,7 @@ import {
   ScrollView,
   FlatList,
   Platform,
+  Alert,
 } from 'react-native';
 import Header from '../../components/Header';
 import {useNavigation, useNavigationParam} from '@react-navigation/native';
@@ -77,7 +78,7 @@ const StoryDetails = ({route}) => {
     }
   };
 
-  const onDeleteStory = async (id) => {
+  const onConfirmDelete = async (id) => {
     const docRef = firestore().collection('stories').doc(id);
     let thumbnailRef = null;
 
@@ -95,6 +96,27 @@ const StoryDetails = ({route}) => {
       .catch((error) => {
         console.log('Error', error);
       });
+  };
+
+  const onDeleteStory = async (id) => {
+    Alert.alert(
+      'Alert',
+      'Remove Image?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: () => {
+            onConfirmDelete(id);
+          },
+        },
+      ],
+      {cancelable: false},
+    );
   };
 
   const onEditStory = (id) => {
@@ -161,10 +183,10 @@ const StoryDetails = ({route}) => {
     <View style={[styles.container]}>
       <Header
         onPress={() => onGoBack()}
-        remove
+        remove={data.uploader === currentUser && true}
         onDeletePress={() => onDeleteStory(id)}
-        //   edit
-        //   onEditPress={() => onEditStory(id)}
+        edit={data.uploader === currentUser && true}
+        onEditPress={() => onEditStory(id)}
       />
       <ScrollView contentContainerStyle={{flexGrow: 1}}>
         {thumbnail && (
@@ -222,17 +244,19 @@ const StoryDetails = ({route}) => {
                         }}>
                         {user}
                       </Text>
-                      <TouchableOpacity
-                        onPress={() => {
-                          onDeleteComment(id);
-                        }}>
-                        <View>
-                          <Image
-                            source={deleteIcon}
-                            style={{width: 24, height: 24}}
-                          />
-                        </View>
-                      </TouchableOpacity>
+                      {user === currentUser && (
+                        <TouchableOpacity
+                          onPress={() => {
+                            onDeleteComment(id);
+                          }}>
+                          <View>
+                            <Image
+                              source={deleteIcon}
+                              style={{width: 24, height: 24}}
+                            />
+                          </View>
+                        </TouchableOpacity>
+                      )}
                     </View>
                     <Text style={{fontSize: 10, color: Color.grey}}>
                       {moment(date).format('llll')}

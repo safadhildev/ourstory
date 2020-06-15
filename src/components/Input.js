@@ -20,11 +20,11 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     backgroundColor: Color.lightGrey,
     justifyContent: 'center',
-    padding: 5,
+    paddingHorizontal: 5,
   },
   input: {
     flex: 1,
-    textAlignVertical: 'top',
+    textAlignVertical: 'center',
     padding: 10,
   },
   editorMenu: {
@@ -109,8 +109,9 @@ const Input = ({
         <TextInput
           style={[
             styles.input,
+            multiline && {textAlignVertical: 'top'},
             center && {textAlign: 'center'},
-            bold && {fontWeight: 'bold', fontSize: 24},
+            bold && {fontWeight: 'bold'},
           ]}
           placeholder={placeholder}
           value={value}

@@ -27,8 +27,8 @@ const styles = StyleSheet.create({
   title: {
     color: Color.black,
     flex: 1,
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 14,
+    paddingHorizontal: 5,
   },
   imageWrapper: {
     height: 300,
@@ -98,7 +98,7 @@ const Card = ({
           }}>
           <Image
             source={user.image ? {uri: user.image} : userBlack}
-            style={{width: 30, height: 30}}
+            style={{width: 30, height: 30, borderRadius: 30}}
           />
           <Text style={{paddingLeft: 10}}>{user.id}</Text>
         </View>
@@ -110,13 +110,18 @@ const Card = ({
           />
         </View>
         <View style={styles.contentContainer}>
-          <Text
-            allowFontScaling={false}
-            style={styles.title}
-            numberOfLines={1}
-            ellipsizeMode="tail">
-            {title}
-          </Text>
+          <View style={{flex: 1, flexDirection: 'row'}}>
+            <Text style={{fontWeight: 'bold'}} allowFontScaling={false}>
+              {user.id}
+            </Text>
+            <Text
+              allowFontScaling={false}
+              style={styles.title}
+              numberOfLines={1}
+              ellipsizeMode="tail">
+              {title}
+            </Text>
+          </View>
           <View
             style={{
               flexDirection: 'row',
