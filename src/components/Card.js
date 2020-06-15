@@ -64,8 +64,6 @@ const Card = ({
     // console.log({uploader});
 
     if (userRef.exists) {
-      console.log({userRef});
-
       const {name, image} = userRef.data();
       setUser({
         name,
@@ -144,7 +142,7 @@ const Card = ({
           </View>
         </View>
         <Text
-          style={{paddingHorizontal: 20, lineHeight: 10, fontSize: 10}}
+          style={{paddingHorizontal: 20, lineHeight: 15, fontSize: 10}}
           allowFontScaling={false}>
           {date}
         </Text>

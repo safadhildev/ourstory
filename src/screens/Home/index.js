@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,7 @@ import {
   BackHandler,
 } from 'react-native';
 
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import firebase from '@react-native-firebase/app';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -67,36 +67,35 @@ const Home = () => {
     return () => subs;
   }, []);
 
-  useEffect(() => {
-    const backAction = () => {
-      Alert.alert('Exit', 'Are you sure?', [
-        {
-          text: 'Cancel',
-          onPress: () => null,
-          style: 'cancel',
-        },
-        {
-          text: 'YES',
-          onPress: async () => {
-            try {
-              // await AsyncStorage.clear();
-              BackHandler.exitApp();
-            } catch (err) {
-              console.log('Home - useEffect =>', err);
-            }
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        Alert.alert('Exit', 'Are you sure?', [
+          {
+            text: 'Cancel',
+            onPress: () => null,
+            style: 'cancel',
           },
-        },
-      ]);
-      return true;
-    };
+          {
+            text: 'YES',
+            onPress: async () => {
+              try {
+                // await AsyncStorage.clear();
+                BackHandler.exitApp();
+              } catch (err) {
+                console.log('Home - useEffect =>', err);
+              }
+            },
+          },
+        ]);
+        return true;
+      };
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      backAction,
-    );
-
-    return () => backHandler.remove();
-  }, []);
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, []),
+  );
 
   const renderStories = (item, index) => {
     const {title, content, thumbnail, uploader, date, comments} = item;

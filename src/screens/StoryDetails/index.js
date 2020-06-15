@@ -27,6 +27,7 @@ const deleteIcon = require('../../../assets/icons/round_delete_black_24dp.png');
 const StoryDetails = ({route}) => {
   const {id} = route.params;
   const [currentUser, setCurrentUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [data, setData] = useState({
     title: null,
     content: null,
@@ -58,8 +59,6 @@ const StoryDetails = ({route}) => {
   };
   const getData = (snapshot) => {
     try {
-      console.log({snapshot});
-
       const {
         title,
         thumbnail,
@@ -73,12 +72,14 @@ const StoryDetails = ({route}) => {
       }
 
       setData({title, thumbnail, date, content, comments, uploader});
+      setLoading(false);
     } catch (err) {
       console.log('Story Details - getData()', err);
     }
   };
 
   const onConfirmDelete = async (id) => {
+    setLoading(true);
     const docRef = firestore().collection('stories').doc(id);
     let thumbnailRef = null;
 
@@ -100,8 +101,8 @@ const StoryDetails = ({route}) => {
 
   const onDeleteStory = async (id) => {
     Alert.alert(
-      'Alert',
-      'Remove Image?',
+      'Delete',
+      'Are you sure?',
       [
         {
           text: 'Cancel',
@@ -122,10 +123,9 @@ const StoryDetails = ({route}) => {
   const onEditStory = (id) => {
     navigation.navigate('StoryEdit', {id, data});
   };
+
   const sendComment = async () => {
     const {comments} = data;
-    console.log({comments});
-
     try {
       const docRef = firestore().collection('stories').doc(id);
 
@@ -151,7 +151,6 @@ const StoryDetails = ({route}) => {
   };
 
   const onDeleteComment = async (commentId) => {
-    console.log({commentId});
     const docRef = firestore().collection('stories').doc(id);
 
     const filterComments = data.comments.filter(
@@ -296,6 +295,19 @@ const StoryDetails = ({route}) => {
           </View>
         </View>
       </ScrollView>
+      {loading && (
+        <View
+          style={{
+            width: '100%',
+            height: '100%',
+            position: 'absolute',
+            backgroundColor: Color.white,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Text>Loading . . .</Text>
+        </View>
+      )}
     </View>
   );
 };

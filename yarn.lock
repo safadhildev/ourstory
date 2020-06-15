@@ -6076,6 +6076,11 @@ react-native@0.62.2:
     use-subscription "^1.0.0"
     whatwg-fetch "^3.0.0"
 
+react-navigation-backhandler@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/react-navigation-backhandler/-/react-navigation-backhandler-2.0.0.tgz#cad1ec997ddfe935788c841c6acc3bf920c5a11f"
+  integrity sha512-GoHeYPToJIoaw5LXigK0y9Ymvc1UlZ7Q49NGX82OTMrHSmxphT++IomVKpsk3Wk0z1dYUSu4dceJcyq6Xcli8A==
+
 react-refresh@^0.4.0:
   version "0.4.3"
   resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.4.3.tgz#966f1750c191672e76e16c2efa569150cc73ab53"
