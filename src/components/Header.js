@@ -4,16 +4,16 @@ import Hamburger from './Hamburger';
 import color from './Color';
 import Color from './Color';
 
-const drawerBlack = require('../../assets/icons/menu_black_24dp.png');
+const drawerBlack = require('../../assets/icons/round_menu_black_48dp.png');
 const drawerWhite = require('../../assets/icons/menu_white_24dp.png');
 const backBlack = require('../../assets/icons/round_arrow_back_black_48dp.png');
 const editIcon = require('../../assets/icons/round_edit_black_24dp.png');
 const deleteIcon = require('../../assets/icons/round_delete_black_24dp.png');
+const addIcon = require('../../assets/icons/round_add_black_48dp.png');
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     paddingHorizontal: 15,
     paddingVertical: 15,
     alignItems: 'center',
@@ -44,6 +44,8 @@ const Header = ({
   remove,
   onDeletePress,
   onEditPress,
+  add,
+  onAddPress,
 }) => {
   const selectMenuType = () => {
     switch (menu) {
@@ -71,6 +73,18 @@ const Header = ({
         ellipsizeMode="tail">
         {text}
       </Text>
+      {add && (
+        <TouchableOpacity onPress={onAddPress}>
+          <Image
+            source={addIcon}
+            style={{
+              width: 36,
+              height: 36,
+              alignSelf: 'flex-end',
+            }}
+          />
+        </TouchableOpacity>
+      )}
       {edit && (
         <TouchableOpacity onPress={onEditPress}>
           <Image

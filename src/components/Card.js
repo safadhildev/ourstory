@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
   title: {
     color: Color.black,
     flex: 1,
-    fontSize: 14,
+    fontSize: 16,
     paddingHorizontal: 5,
   },
   imageWrapper: {
@@ -39,9 +39,9 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingHorizontal: 20,
-    paddingVertical: 5,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    paddingTop: 5,
   },
 });
 
@@ -111,7 +111,9 @@ const Card = ({
         </View>
         <View style={styles.contentContainer}>
           <View style={{flex: 1, flexDirection: 'row'}}>
-            <Text style={{fontWeight: 'bold'}} allowFontScaling={false}>
+            <Text
+              style={{fontWeight: 'bold', fontSize: 16}}
+              allowFontScaling={false}>
               {user.id}
             </Text>
             <Text
@@ -141,6 +143,11 @@ const Card = ({
             </View>
           </View>
         </View>
+        <Text
+          style={{paddingHorizontal: 20, lineHeight: 10, fontSize: 10}}
+          allowFontScaling={false}>
+          {date}
+        </Text>
       </View>
     </TouchableOpacity>
   );

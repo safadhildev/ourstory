@@ -119,14 +119,22 @@ const Home = () => {
 
   return (
     <View style={styles.container}>
-      <Header text="Home" onPress={() => onOpenDrawer()} menu="drawer" />
+      <Header
+        text="Our Story"
+        onPress={() => onOpenDrawer()}
+        menu="drawer"
+        add
+        onAddPress={() => {
+          onAddStory();
+        }}
+      />
       <FlatList
         data={data}
         renderItem={({item, index}) => renderStories(item, index)}
         keyExtractor={(item) => item.id}
       />
 
-      <Fab onPress={() => onAddStory()} />
+      {/* <Fab onPress={() => onAddStory()} /> */}
       {loading && (
         <View style={styles.loading}>
           <Text>Loading ...</Text>
